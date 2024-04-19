@@ -23,10 +23,10 @@ public static class OllamaClientServiceCollectionExtensions
         var configuration = new OllamaConfiguration();
         configurationAction(configuration);
         services
-            .AddTransient<IClient, Client>()
+            .AddTransient<IOllamaHttpClient, OllamaHttpClient>()
             .AddSingleton<IStatefulConversationOllamaService, StatefulConversationOllamaService>()
             .AddTransient((s) => configuration)
-            .AddHttpClient(nameof(Client));
+            .AddHttpClient<OllamaHttpClient>(o=> o.BaseAddress = new Uri(configuration.OllamaEndpoint));
 
         return services;
     }

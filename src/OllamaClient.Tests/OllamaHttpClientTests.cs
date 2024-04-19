@@ -6,20 +6,15 @@ using Moq;
 using Newtonsoft.Json;
 
 using OllamaClient;
-using OllamaClient.Configuration;
 using OllamaClient.Models;
 
-public class OllamaClientTests
+public class OllamaHttpClientTests
 {
     [Fact]
     public async Task GetModels_ReturnsModels()
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new Configuration.OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var expectedResponse = new Models.GetModelsResponse
         {
@@ -31,9 +26,10 @@ public class OllamaClientTests
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(expectedResponse)) });
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
 
         // Act
         var response = await ollamaClient.GetModels(default);
@@ -48,18 +44,15 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var expectedResponse = new CopyResponse { IsSuccessful = true };
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK));
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var copyRequest = new CopyRequest();
         var cancellationToken = default(CancellationToken);
 
@@ -76,15 +69,12 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var httpClient = new HttpClient(new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.InternalServerError)));
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
 
         // Act & Assert
         await Assert.ThrowsAsync<HttpRequestException>(async () => await ollamaClient.GetModels(default));
@@ -95,16 +85,13 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.BadRequest));
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var copyRequest = new CopyRequest();
         var cancellationToken = default(CancellationToken);
 
@@ -119,11 +106,6 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
-
         var expectedResponse = new CreateModelResponse
         {
         };
@@ -136,9 +118,10 @@ public class OllamaClientTests
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(responseMessage);
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var createRequest = new CreateModelRequest
         {
             Stream = stream,
@@ -160,10 +143,6 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var expectedResponse = new DeleteResponse
         {
@@ -172,9 +151,10 @@ public class OllamaClientTests
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(expectedResponse)) });
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var deleteRequest = new DeleteRequest();
         var cancellationToken = default(CancellationToken);
 
@@ -191,10 +171,6 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var expectedResponse = new EmbeddingsResponse
         {
@@ -202,9 +178,10 @@ public class OllamaClientTests
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(expectedResponse)) });
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var embeddingsRequest = new EmbeddingsRequest()
         {
             KeepAlive = "5m",
@@ -227,10 +204,6 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var expectedResponse = new GenerateResponse
         {
@@ -238,9 +211,10 @@ public class OllamaClientTests
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(expectedResponse)) });
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var generateRequest = new GenerateRequest()
         {
             Stream = false,
@@ -270,10 +244,6 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var expectedResponse = new PullResponse
         {
@@ -281,9 +251,10 @@ public class OllamaClientTests
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(expectedResponse)) });
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var pullRequest = new PullRequest();
         var cancellationToken = default(CancellationToken);
 
@@ -300,10 +271,6 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var expectedResponse = new PushResponse
         {
@@ -311,9 +278,10 @@ public class OllamaClientTests
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(expectedResponse)) });
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var pushRequest = new PushRequest()
         {
             Name = "test",
@@ -335,10 +303,6 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var expectedResponse = new PushResponse
         {
@@ -346,9 +310,10 @@ public class OllamaClientTests
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(expectedResponse)) });
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var pushRequest = new PushRequest()
         {
             Name = "test",
@@ -372,10 +337,6 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var expectedResponse = new ChatResponse
         {
@@ -383,9 +344,10 @@ public class OllamaClientTests
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonConvert.SerializeObject(expectedResponse)) });
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var chatRequest = new ChatStreamlessRequest()
         {
             Format = "format",
@@ -443,10 +405,6 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var expectedResponse = new ChatResponse
         {
@@ -466,9 +424,10 @@ public class OllamaClientTests
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(responseMessage);
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var chatRequest = new ChatStreamRequest();
         var cancellationToken = default(CancellationToken);
 
@@ -486,10 +445,6 @@ public class OllamaClientTests
     {
         // Arrange
         var httpClientFactoryMock = new Mock<IHttpClientFactory>();
-        var configuration = new OllamaConfiguration
-        {
-            OllamaEndpoint = "http://example.com/"
-        };
 
         var expectedResponse = new ShowResponse
         {
@@ -505,9 +460,10 @@ public class OllamaClientTests
 
         var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(expectedResponse)) });
         var httpClient = new HttpClient(fakeHttpMessageHandler);
+        httpClient.BaseAddress = new Uri("http://localhost:11434/");
         httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
-        var ollamaClient = new Client(httpClientFactoryMock.Object, configuration);
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var showRequest = new ShowRequest();
         var cancellationToken = default(CancellationToken);
 

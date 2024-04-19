@@ -11,7 +11,7 @@ public class StatefulConversationOllamaServiceTests
     {
         // Arrange
         var conversationId = Guid.NewGuid();
-        var ollamaClientMock = new Mock<IClient>();
+        var ollamaClientMock = new Mock<IOllamaHttpClient>();
         var service = new StatefulConversationOllamaService(ollamaClientMock.Object);
         var chatRequest = new ConversationChatStreamlessRequest
         {
@@ -37,7 +37,7 @@ public class StatefulConversationOllamaServiceTests
     {
         // Arrange
         var conversationId = Guid.NewGuid();
-        var ollamaClientMock = new Mock<IClient>();
+        var ollamaClientMock = new Mock<IOllamaHttpClient>();
         var service = new StatefulConversationOllamaService(ollamaClientMock.Object);
         var chatRequest = new ConversationChatStreamRequest
         {

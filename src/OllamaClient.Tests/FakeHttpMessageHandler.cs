@@ -11,7 +11,7 @@ public class FakeHttpMessageHandler(HttpResponseMessage fakeResponse) : HttpMess
         {
             Content = new StringContent(""),
             // Copy fake response details to the actual response
-            StatusCode = fakeResponse.StatusCode
+            StatusCode = fakeResponse.StatusCode,
         };
         response.Content = fakeResponse.Content;
 

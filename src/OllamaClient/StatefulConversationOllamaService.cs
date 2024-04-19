@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 using Models;
 
-public class StatefulConversationOllamaService(IClient ollamaClient) : IStatefulConversationOllamaService
+public class StatefulConversationOllamaService(IOllamaHttpClient ollamaClient) : IStatefulConversationOllamaService
 {
     private readonly ConcurrentDictionary<Guid, List<Message>> Conversations = new();
 

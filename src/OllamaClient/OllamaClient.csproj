@@ -4,11 +4,35 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>OllamaClient</Title>
+    <Company>Dev Art Solutions</Company>
+    <Authors>iovigi</Authors>
+    <Description>.NET client library for Ollama  - your gateway to seamless integration with the powerful Ollama APIs. This library provides developers with a straightforward way to interact with Ollama APIs, enabling rapid development of robust applications in C#.</Description>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/Dev-Art-Solutions/OllamaClient</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Dev-Art-Solutions/OllamaClient</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
