@@ -21,5 +21,5 @@ public interface IStatefulConversationOllamaService
     /// <param name="chatRequest">Conversation chat request</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Stream response for conversation</returns>
-    IAsyncEnumerable<ChatResponse> SendChatStream(ConversationChatStreamRequest chatRequest, CancellationToken cancellationToken);
+    IAsyncEnumerable<ChatResponse> SendChat(ConversationChatStreamRequest chatRequest, CancellationToken cancellationToken);
 }

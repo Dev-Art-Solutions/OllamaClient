@@ -30,7 +30,7 @@ public class StatefulConversationOllamaService(IOllamaHttpClient ollamaClient) :
         return response;
     }
 
-    public async IAsyncEnumerable<ChatResponse> SendChatStream(ConversationChatStreamRequest chatRequest, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<ChatResponse> SendChat(ConversationChatStreamRequest chatRequest, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         if (!Conversations.TryGetValue(chatRequest.ConversationId, out var messages))
         {
@@ -40,7 +40,7 @@ public class StatefulConversationOllamaService(IOllamaHttpClient ollamaClient) :
 
         messages.AddRange(chatRequest.Messages);
 
-        await foreach(var response in ollamaClient.SendChatStreaming(chatRequest, cancellationToken))
+        await foreach(var response in ollamaClient.SendChat(chatRequest, cancellationToken))
         {
             if (response!.Message != null)
             {

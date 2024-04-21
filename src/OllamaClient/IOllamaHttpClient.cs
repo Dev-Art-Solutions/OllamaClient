@@ -13,7 +13,15 @@ public interface IOllamaHttpClient
     /// <param name="request">Create Model Request</param>
     /// <param name="cancellationToken">Cancellation Token</param>
     /// <returns>The status of the created model</returns>
-    IAsyncEnumerable<CreateModelResponse> Create(CreateModelRequest request, CancellationToken cancellationToken);
+    Task<CreateModelResponse> Create(CreateModelRequest request, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Create a model from a Modelfile. It is recommended to set modelfile to the content of the Modelfile rather than just set path. This is a requirement for remote create. Remote model creation must also create any file blobs, fields such as FROM and ADAPTER, explicitly with the server using Create a Blob and the value to the path indicated in the response.
+    /// </summary>
+    /// <param name="request">Create Model Request</param>
+    /// <param name="cancellationToken">Cancellation Token</param>
+    /// <returns>The status of the created model</returns>
+    IAsyncEnumerable<CreateModelResponse> Create(CreateModelStreamRequest request, CancellationToken cancellationToken);
 
     /// <summary>
     /// Generate a response for a given prompt with a provided model. This is a streaming endpoint, so there will be a series of responses. The final response object will include statistics and additional data from the request.
@@ -21,7 +29,15 @@ public interface IOllamaHttpClient
     /// <param name="request">Generate Request</param>
     /// <param name="cancellationToken">Cancellation Token</param>
     /// <returns>Generate Response</returns>
-    IAsyncEnumerable<GenerateResponse> Generate(GenerateRequest request, CancellationToken cancellationToken);
+    Task<GenerateResponse> Generate(GenerateRequest request, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Generate a response for a given prompt with a provided model. This is a streaming endpoint, so there will be a series of responses. The final response object will include statistics and additional data from the request.
+    /// </summary>
+    /// <param name="request">Generate Request</param>
+    /// <param name="cancellationToken">Cancellation Token</param>
+    /// <returns>Generate Response</returns>
+    IAsyncEnumerable<GenerateResponse> Generate(GenerateStreamRequest request, CancellationToken cancellationToken);
 
     /// <summary>
     /// Generate the next message in a chat with a provided model. This is not a streaming endpoint, so there will be a single of response. 
@@ -29,7 +45,7 @@ public interface IOllamaHttpClient
     /// <param name="chatRequest">Chat Request</param>
     /// <param name="cancellationToken">Cancellation Token</param>
     /// <returns>Chat Response</returns>
-    Task<ChatResponse> SendChat(ChatStreamlessRequest chatRequest, CancellationToken cancellationToken);
+    Task<ChatResponse> SendChat(ChatRequest chatRequest, CancellationToken cancellationToken);
 
     /// <summary>
     /// Generate the next message in a chat with a provided model. This is a streaming endpoint, so there will be a series of responses. The final response object will include statistics and additional data from the request.
@@ -37,7 +53,7 @@ public interface IOllamaHttpClient
     /// <param name="chatRequest">Chat Request</param>
     /// <param name="cancellationToken">Cancellation Token</param>
     /// <returns>Chat Response</returns>
-    IAsyncEnumerable<ChatResponse> SendChatStreaming(ChatStreamRequest chatRequest, CancellationToken cancellationToken);
+    IAsyncEnumerable<ChatResponse> SendChat(ChatStreamRequest chatRequest, CancellationToken cancellationToken);
 
     /// <summary>
     /// Get a list of available models
@@ -76,7 +92,15 @@ public interface IOllamaHttpClient
     /// <param name="pullRequest">Pull model request</param>
     /// <param name="cancellationToken">Cancellation Token</param>
     /// <returns>Pull model status response</returns>
-    IAsyncEnumerable<PullResponse> Pull(PullRequest pullRequest, CancellationToken cancellationToken);
+    Task<PullResponse> Pull(PullRequest pullRequest, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Download a model from the ollama library. Cancelled pulls are resumed from where they left off, and multiple calls will share the same download progress.
+    /// </summary>
+    /// <param name="pullRequest">Pull model request</param>
+    /// <param name="cancellationToken">Cancellation Token</param>
+    /// <returns>Pull model status response</returns>
+    IAsyncEnumerable<PullResponse> Pull(PullStreamRequest pullRequest, CancellationToken cancellationToken);
 
     /// <summary>
     /// Upload a model to a model library. Requires registering for ollama.ai and adding a public key first.
@@ -84,7 +108,15 @@ public interface IOllamaHttpClient
     /// <param name="pushRequest">Push model request</param>
     /// <param name="cancellationToken">Cancellation Token</param>
     /// <returns>Push model status response</returns>
-    IAsyncEnumerable<PushResponse> Push(PushRequest pushRequest, CancellationToken cancellationToken);
+    Task<PushResponse> Push(PushRequest pushRequest, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Upload a model to a model library. Requires registering for ollama.ai and adding a public key first.
+    /// </summary>
+    /// <param name="pushRequest">Push model request</param>
+    /// <param name="cancellationToken">Cancellation Token</param>
+    /// <returns>Push model status response</returns>
+    IAsyncEnumerable<PushResponse> Push(PushStreamRequest pushRequest, CancellationToken cancellationToken);
 
     /// <summary>
     /// Generate embeddings from a model

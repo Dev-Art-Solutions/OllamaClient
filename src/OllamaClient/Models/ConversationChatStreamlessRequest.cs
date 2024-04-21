@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 /// <summary>
 /// Conversation Streamless Chat Request
 /// </summary>
-public class ConversationChatStreamlessRequest : ChatStreamlessRequest
+public class ConversationChatStreamlessRequest : ChatRequest
 {
     /// <summary>
     /// Conversation Id: It should be unique for each conversation

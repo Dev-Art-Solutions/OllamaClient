@@ -5,13 +5,13 @@ using System.Text.Json.Serialization;
 /// <summary>
 /// Chat Request Model
 /// </summary>
-public abstract class ChatRequest
+public class ChatRequest : StreamingRequest
 {
     /// <summary>
     /// stream: if false the response will be returned as a single response object, rather than a stream of objects
     /// </summary>
     [JsonPropertyName("stream")]
-    public abstract bool Stream { get; }
+    public override bool Stream => false;
 
     /// <summary>
     /// model: (required) the model name

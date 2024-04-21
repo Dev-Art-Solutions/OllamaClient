@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿namespace OllamaClient.Models;
 
-namespace OllamaClient.Models;
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// Show information request

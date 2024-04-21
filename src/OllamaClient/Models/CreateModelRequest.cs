@@ -26,4 +26,10 @@ public class CreateModelRequest : StreamingRequest
     [JsonPropertyName("path")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Path { get; set; }
+
+    /// <summary>
+    /// stream: if false the response will be returned as a single response object, rather than a stream of objects
+    /// </summary>
+    [JsonPropertyName("stream")]
+    public override bool Stream => false;
 }

@@ -2,11 +2,14 @@
 
 using System.Text.Json.Serialization;
 
-public abstract class StreamingRequest
+/// <summary>
+/// Create a new model stream request
+/// </summary>
+public class CreateModelStreamRequest : CreateModelRequest
 {
     /// <summary>
     /// stream: if false the response will be returned as a single response object, rather than a stream of objects
     /// </summary>
     [JsonPropertyName("stream")]
-    public abstract bool Stream { get; }
+    public override bool Stream => true;
 }

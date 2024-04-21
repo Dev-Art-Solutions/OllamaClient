@@ -19,4 +19,10 @@ public class PushRequest : StreamingRequest
     [JsonPropertyName("insecure")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? Insecure { get; set; }
+
+    /// <summary>
+    /// stream: if false the response will be returned as a single response object, rather than a stream of objects
+    /// </summary>
+    [JsonPropertyName("stream")]
+    public override bool Stream => false;
 }

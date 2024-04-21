@@ -52,12 +52,12 @@ public class StatefulConversationOllamaServiceTests
         };
 
         ollamaClientMock
-            .Setup(x => x.SendChatStreaming(chatRequest, cancellationToken))
+            .Setup(x => x.SendChat(chatRequest, cancellationToken))
             .Returns(ToAsync(expectedResponse));
 
         // Act & Assert
         int i = 0;
-        await foreach (var response in service.SendChatStream(chatRequest, cancellationToken))
+        await foreach (var response in service.SendChat(chatRequest, cancellationToken))
         {
             Assert.NotNull(response);
             Assert.Equivalent(expectedResponse[i++], response);

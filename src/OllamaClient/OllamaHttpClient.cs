@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 
 using Models;
 using Extensions;
+using OllamaClient.Exceptions;
 
 public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHttpClient
 {
@@ -15,9 +16,14 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
         return await PostAsJsonAsync("copy", copyRequest, (response) => new CopyResponse() { IsSuccessful = response!.IsSuccessStatusCode }, cancellationToken);
     }
 
-    public IAsyncEnumerable<CreateModelResponse> Create(CreateModelRequest request, CancellationToken cancellationToken)
+    public async Task<CreateModelResponse> Create(CreateModelRequest request, CancellationToken cancellationToken)
     {
-        return StreamingPostAsJsonAsync<CreateModelResponse, CreateModelRequest>("create", request, cancellationToken);
+        return await PostAsJsonAsync<CreateModelResponse, CreateModelRequest>("create", request, null, cancellationToken);
+    }
+
+    public IAsyncEnumerable<CreateModelResponse> Create(CreateModelStreamRequest request, CancellationToken cancellationToken)
+    {
+        return StreamingPostAsJsonAsync<CreateModelResponse, CreateModelStreamRequest>("create", request, cancellationToken);
     }
 
     public async Task<DeleteResponse> Delete(DeleteRequest deleteRequest, CancellationToken cancellationToken)
@@ -25,9 +31,14 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
         return await PostAsJsonAsync("delete", deleteRequest, (response) => new DeleteResponse() { IsSuccessful = response!.IsSuccessStatusCode }, cancellationToken);
     }
 
-    public IAsyncEnumerable<GenerateResponse> Generate(GenerateRequest request, CancellationToken cancellationToken)
+    public async Task<GenerateResponse> Generate(GenerateRequest request, CancellationToken cancellationToken)
     {
-        return StreamingPostAsJsonAsync<GenerateResponse, GenerateRequest>("generate", request, cancellationToken);
+        return await PostAsJsonAsync<GenerateResponse, GenerateRequest>("generate", request, null, cancellationToken);
+    }
+
+    public IAsyncEnumerable<GenerateResponse> Generate(GenerateStreamRequest request, CancellationToken cancellationToken)
+    {
+        return StreamingPostAsJsonAsync<GenerateResponse, GenerateStreamRequest>("generate", request, cancellationToken);
     }
 
     public async Task<EmbeddingsResponse> GetEmbeddings(EmbeddingsRequest embeddingsRequest, CancellationToken cancellationToken)
@@ -38,36 +49,44 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
     public async Task<GetModelsResponse> GetModels(CancellationToken cancellationToken)
     {
         using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
-        var response = await httpClient.GetFromJsonAsync<GetModelsResponse>($"api/tags", cancellationToken);
+        var response = await httpClient.GetAsync($"api/tags", cancellationToken);
 
-        return response!;
-    }
-
-    public IAsyncEnumerable<PullResponse> Pull(PullRequest pullRequest, CancellationToken cancellationToken)
-    {
-        return StreamingPostAsJsonAsync<PullResponse, PullRequest>("pull", pullRequest, cancellationToken);
-    }
-
-    public IAsyncEnumerable<PushResponse> Push(PushRequest pushRequest, CancellationToken cancellationToken)
-    {
-        return StreamingPostAsJsonAsync<PushResponse, PushRequest>("push", pushRequest, cancellationToken);
-    }
-
-    public async Task<ChatResponse> SendChat(ChatStreamlessRequest chatRequest, CancellationToken cancellationToken)
-    {
-        return await PostAsJsonAsync<ChatResponse, ChatStreamlessRequest>("chat", chatRequest, default, cancellationToken);
-    }
-
-    public async IAsyncEnumerable<ChatResponse> SendChatStreaming(ChatStreamRequest chatRequest, [EnumeratorCancellation] CancellationToken cancellationToken)
-    {
-        using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
-        var response = await httpClient.PostAsJsonAsync($"api/chat", chatRequest, cancellationToken);
-        response.EnsureSuccessStatusCode();
-
-        await foreach (var value in response.Content.ReadFromNdjsonAsync<ChatResponse>(cancellationToken)!)
+        if (!response.IsSuccessStatusCode)
         {
-            yield return value;
+            throw new OllamaException(await response.Content.ReadAsStringAsync());
         }
+
+        return (await response.Content.ReadFromJsonAsync<GetModelsResponse>())!;
+    }
+
+    public async Task<PullResponse> Pull(PullRequest pullRequest, CancellationToken cancellationToken)
+    {
+        return await PostAsJsonAsync<PullResponse, PullRequest>("pull", pullRequest, null, cancellationToken);
+    }
+
+    public IAsyncEnumerable<PullResponse> Pull(PullStreamRequest pullRequest, CancellationToken cancellationToken)
+    {
+        return StreamingPostAsJsonAsync<PullResponse, PullStreamRequest>("pull", pullRequest, cancellationToken);
+    }
+
+    public async Task<PushResponse> Push(PushRequest pushRequest, CancellationToken cancellationToken)
+    {
+        return await PostAsJsonAsync<PushResponse, PushRequest>("push", pushRequest, null, cancellationToken);
+    }
+
+    public IAsyncEnumerable<PushResponse> Push(PushStreamRequest pushRequest, CancellationToken cancellationToken)
+    {
+        return StreamingPostAsJsonAsync<PushResponse, PushStreamRequest>("push", pushRequest, cancellationToken);
+    }
+
+    public async Task<ChatResponse> SendChat(ChatRequest chatRequest, CancellationToken cancellationToken)
+    {
+        return await PostAsJsonAsync<ChatResponse, ChatRequest>("chat", chatRequest, default, cancellationToken);
+    }
+
+    public IAsyncEnumerable<ChatResponse> SendChat(ChatStreamRequest chatRequest, CancellationToken cancellationToken)
+    {
+        return StreamingPostAsJsonAsync<ChatResponse, ChatStreamRequest>("chat", chatRequest, cancellationToken);
     }
 
     public async Task<ShowResponse> Show(ShowRequest showRequest, CancellationToken cancellationToken)
@@ -79,7 +98,11 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
     {
         using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
         var response = await httpClient.PostAsJsonAsync($"api/{action}", value, cancellationToken);
-        response.EnsureSuccessStatusCode();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new OllamaException(await response.Content.ReadAsStringAsync());
+        }
 
         return (factory != null ? factory(response) : (await response.Content.ReadFromJsonAsync<TResult>(cancellationToken))!);
     }
@@ -89,18 +112,15 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
     {
         using var client = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
         var response = await client.PostAsJsonAsync($"api/{action}", request, cancellationToken);
-        response.EnsureSuccessStatusCode();
 
-        if (request.Stream != null && request.Stream.Value)
+        if (!response.IsSuccessStatusCode)
         {
-            await foreach (var value in response.Content.ReadFromNdjsonAsync<TResult>(cancellationToken))
-            {
-                yield return value;
-            }
+            throw new OllamaException(await response.Content.ReadAsStringAsync());
         }
-        else
+
+        await foreach (var value in response.Content.ReadFromNdjsonAsync<TResult>(cancellationToken))
         {
-            yield return (await response.Content.ReadFromJsonAsync<TResult>(cancellationToken))!;
+            yield return value;
         }
     }
 }
