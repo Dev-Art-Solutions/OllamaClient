@@ -14,9 +14,15 @@
     <PackageProjectUrl>https://github.com/Dev-Art-Solutions/OllamaClient</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Dev-Art-Solutions/OllamaClient</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+	 <PackageVersion>1.0.0</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
