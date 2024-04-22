@@ -1,7 +1,5 @@
 # OllamaClient
-.NET client library for Ollama  - your gateway to seamless integration with the powerful Ollama APIs. This library provides developers with a straightforward way to interact with Ollama APIs, enabling rapid development of robust applications in C#.
-
-Repository of [Ollama](https://github.com/ollama/ollama)
+.NET client library for [Ollama](https://github.com/ollama/ollama)  - your gateway to seamless integration with the powerful [Ollama APIs](https://github.com/ollama/ollama). This library provides developers with a straightforward way to interact with [Ollama APIs](https://github.com/ollama/ollama), enabling rapid development of robust applications in C#.
 
 ## Build status
 ![build and test](https://github.com/Dev-Art-Solutions/OllamaClient/actions/workflows/build-and-test.yml/badge.svg)
