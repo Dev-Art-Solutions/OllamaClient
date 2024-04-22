@@ -11,7 +11,7 @@
 Install OllamaClient via NuGet Package Manager Console:
 
 ```bash
-Install-Package [OllamaClient](https://www.nuget.org/packages/OllamaClient)
+Install-Package OllamaClient
 ```
 
 ### Example
