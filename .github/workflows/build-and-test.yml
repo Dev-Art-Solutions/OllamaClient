@@ -1,36 +1,40 @@
-# This is a basic workflow to help you get started with Actions
-
 name: build and test
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [ main ]
-
-  # Allows you to run this workflow manually from the Actions tab
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    strategy:
+      matrix:
+        dotnet-version: [ '9.0.x', '10.0.x' ]
+
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-      - name: cd dir
-        run: cd src
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore
+        run: dotnet restore src
+
+      - name: Format check
+        run: dotnet format src --verify-no-changes
+
       - name: Build
-        run: dotnet build src --configuration Release /p:Version=1.0.${{ github.run_number }}
+        run: dotnet build src --configuration Release --no-restore /p:Version=1.1.${{ github.run_number }}
+
       - name: Test
-        run: dotnet test src --configuration Release /p:Version=1.0.${{ github.run_number }} --no-build
-      #- name: Pack
-      #  run: dotnet pack src --configuration Release /p:Version=1.0.${{ github.run_number }} --no-build --output .
-      #- name: Push
-      #  run: dotnet nuget push *.*.*.*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${NUGET_TOKEN}
-      #  env:
-      #    NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
+        run: dotnet test src --configuration Release --no-build /p:Version=1.1.${{ github.run_number }}
+
+      - name: Pack (main only)
+        if: github.ref == 'refs/heads/main' && matrix.dotnet-version == '10.0.x'
+        run: dotnet pack src/OllamaClient/OllamaClient.csproj --configuration Release --no-build /p:Version=1.1.${{ github.run_number }}
