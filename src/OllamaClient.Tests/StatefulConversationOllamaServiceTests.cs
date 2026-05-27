@@ -21,7 +21,7 @@ public class StatefulConversationOllamaServiceTests
 
         var expectedResponse = new ChatResponse { Message = new Message { Content = "Response 1" } };
         var cancellationToken = CancellationToken.None;
-        ollamaClientMock.Setup(x=> x.SendChat(chatRequest, cancellationToken))
+        ollamaClientMock.Setup(x => x.SendChat(chatRequest, cancellationToken))
               .ReturnsAsync(expectedResponse);
 
         // Act

@@ -28,10 +28,10 @@ internal static class HttpContentNdjsonExtensions
         using (contentStream)
         {
             using StreamReader contentStreamReader = new(contentStream);
-            while (!contentStreamReader.EndOfStream)
+            string? line;
+            while ((line = await contentStreamReader.ReadLineAsync(cancellationToken).ConfigureAwait(false)) is not null)
             {
-                yield return JsonSerializer.Deserialize<TValue>((await contentStreamReader.ReadLineAsync(cancellationToken)
-                    .ConfigureAwait(false))!, _serializerOptions)!;
+                yield return JsonSerializer.Deserialize<TValue>(line, _serializerOptions)!;
             }
         }
     }
