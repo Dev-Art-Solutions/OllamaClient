@@ -40,7 +40,7 @@ public class StatefulConversationOllamaService(IOllamaHttpClient ollamaClient) :
 
         messages.AddRange(chatRequest.Messages);
 
-        await foreach(var response in ollamaClient.SendChat(chatRequest, cancellationToken))
+        await foreach (var response in ollamaClient.SendChat(chatRequest, cancellationToken))
         {
             if (response!.Message != null)
             {

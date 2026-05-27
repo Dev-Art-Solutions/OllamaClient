@@ -34,7 +34,7 @@ var result = client.SendChat(new OllamaClient.Models.ChatStreamRequest()
 
 await foreach (var message in result)
 {
-    if(message.Message is null) continue;
+    if (message.Message is null) continue;
 
     Console.Write(message.Message.Content);
 }

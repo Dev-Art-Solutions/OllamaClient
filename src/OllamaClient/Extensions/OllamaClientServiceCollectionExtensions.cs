@@ -26,7 +26,7 @@ public static class OllamaClientServiceCollectionExtensions
             .AddTransient<IOllamaHttpClient, OllamaHttpClient>()
             .AddSingleton<IStatefulConversationOllamaService, StatefulConversationOllamaService>()
             .AddTransient((s) => configuration)
-            .AddHttpClient<OllamaHttpClient>(o=> o.BaseAddress = new Uri(configuration.OllamaEndpoint));
+            .AddHttpClient<OllamaHttpClient>(o => o.BaseAddress = new Uri(configuration.OllamaEndpoint));
 
         return services;
     }
