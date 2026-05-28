@@ -119,6 +119,20 @@ public interface IOllamaHttpClient
     IAsyncEnumerable<PushResponse> Push(PushStreamRequest pushRequest, CancellationToken cancellationToken);
 
     /// <summary>
+    /// Get the Ollama server version.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation Token</param>
+    /// <returns>Version response</returns>
+    Task<VersionResponse> GetVersion(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// List models that are currently loaded into memory.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation Token</param>
+    /// <returns>Running models</returns>
+    Task<PsResponse> GetRunningModels(CancellationToken cancellationToken);
+
+    /// <summary>
     /// Generate embeddings from a model using the legacy <c>/api/embeddings</c> endpoint.
     /// </summary>
     /// <param name="embeddingsRequest">Embeddings Request</param>

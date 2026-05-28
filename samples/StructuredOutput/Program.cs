@@ -20,7 +20,7 @@ var schema = JsonSerializer.SerializeToElement(new
     type = "object",
     properties = new
     {
-        name       = new { type = "string" },
+        name = new { type = "string" },
         birth_year = new { type = "integer" },
         nationality = new { type = "string" }
     },
@@ -49,7 +49,7 @@ var person = JsonSerializer.Deserialize<Person>(json);
 Console.WriteLine($"\nParsed: {person?.Name} ({person?.Nationality}, born {person?.BirthYear})");
 
 record Person(
-    [property: JsonPropertyName("name")]        string Name,
-    [property: JsonPropertyName("birth_year")]  int    BirthYear,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("birth_year")] int BirthYear,
     [property: JsonPropertyName("nationality")] string Nationality
 );

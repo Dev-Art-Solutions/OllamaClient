@@ -769,6 +769,58 @@ public class OllamaHttpClientTests
     }
 
     [Fact]
+    public async Task GetVersion_ReturnsValidResponse()
+    {
+        // Arrange
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        var expectedResponse = new VersionResponse { Version = "0.6.1" };
+
+        var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(expectedResponse))
+        });
+        var httpClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://localhost:11434/") };
+        httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
+
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
+
+        // Act
+        var response = await ollamaClient.GetVersion(default);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal("0.6.1", response.Version);
+    }
+
+    [Fact]
+    public async Task GetRunningModels_ReturnsValidResponse()
+    {
+        // Arrange
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        var expectedResponse = new PsResponse
+        {
+            Models = [new RunningModelResponse { Name = "llama3.1:latest", Model = "llama3.1:latest", Size = 1234 }]
+        };
+
+        var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(expectedResponse))
+        });
+        var httpClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://localhost:11434/") };
+        httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
+
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
+
+        // Act
+        var response = await ollamaClient.GetRunningModels(default);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Single(response.Models);
+        Assert.Equal("llama3.1:latest", response.Models[0].Name);
+    }
+
+    [Fact]
     public async Task Show_ReturnsValidResponse()
     {
         // Arrange
