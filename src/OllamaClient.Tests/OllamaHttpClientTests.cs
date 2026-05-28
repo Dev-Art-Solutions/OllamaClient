@@ -256,7 +256,7 @@ public class OllamaHttpClientTests
         {
             System = "System",
             Context = "context",
-            Format = "json",
+            Format = System.Text.Json.JsonSerializer.SerializeToElement("json"),
             Images = ["image"],
             KeepAlive = "5m",
             Model = "model",
@@ -303,7 +303,7 @@ public class OllamaHttpClientTests
         {
             System = "System",
             Context = "context",
-            Format = "json",
+            Format = System.Text.Json.JsonSerializer.SerializeToElement("json"),
             Images = ["image"],
             KeepAlive = "5m",
             Model = "model",
@@ -542,7 +542,7 @@ public class OllamaHttpClientTests
         var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var chatRequest = new ChatRequest()
         {
-            Format = "format",
+            Format = System.Text.Json.JsonSerializer.SerializeToElement("format"),
             KeepAlive = "5m",
             Messages = [new() { Content = "content" }],
             Model = "model",
