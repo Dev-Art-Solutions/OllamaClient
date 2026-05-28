@@ -45,4 +45,11 @@ public class ChatRequest : StreamingRequest
     [JsonPropertyName("keep_alive")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? KeepAlive { get; set; }
+
+    /// <summary>
+    /// tools (optional): list of tools the model may call; requires a model that supports tool calling
+    /// </summary>
+    [JsonPropertyName("tools")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<Tool>? Tools { get; set; }
 }

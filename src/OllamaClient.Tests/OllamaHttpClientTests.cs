@@ -664,6 +664,74 @@ public class OllamaHttpClientTests
     }
 
     [Fact]
+    public async Task SendChat_WithTools_SerializesToolsAndDeserializesToolCalls()
+    {
+        // Arrange
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+
+        var toolCallJson = """
+            {
+              "model": "llama3.1",
+              "created_at": "2024-07-22T00:00:00Z",
+              "message": {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                  {
+                    "function": {
+                      "name": "get_current_weather",
+                      "arguments": { "location": "Tokyo", "unit": "celsius" }
+                    }
+                  }
+                ]
+              },
+              "done": true
+            }
+            """;
+
+        var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(toolCallJson)
+        });
+        var httpClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://localhost:11434/") };
+        httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
+
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
+
+        var request = new ChatRequest
+        {
+            Model = "llama3.1",
+            Messages = [new Message { Role = "user", Content = "What is the weather in Tokyo?" }],
+            Tools =
+            [
+                new Tool
+                {
+                    Function = new FunctionDefinition
+                    {
+                        Name = "get_current_weather",
+                        Description = "Get weather for a location",
+                        Parameters = System.Text.Json.JsonSerializer.SerializeToElement(new
+                        {
+                            type = "object",
+                            properties = new { location = new { type = "string" } },
+                            required = new[] { "location" }
+                        })
+                    }
+                }
+            ]
+        };
+
+        // Act
+        var response = await ollamaClient.SendChat(request, default);
+
+        // Assert
+        Assert.NotNull(response.Message);
+        Assert.NotNull(response.Message.ToolCalls);
+        Assert.Single(response.Message.ToolCalls);
+        Assert.Equal("get_current_weather", response.Message.ToolCalls[0].Function.Name);
+    }
+
+    [Fact]
     public async Task Show_ReturnsValidResponse()
     {
         // Arrange
