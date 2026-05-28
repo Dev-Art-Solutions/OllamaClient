@@ -41,9 +41,15 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
         return StreamingPostAsJsonAsync<GenerateResponse, GenerateStreamRequest>("generate", request, cancellationToken);
     }
 
+    [Obsolete("Use Embed(EmbedRequest, CancellationToken) instead. The /api/embeddings endpoint is legacy and does not support batch input.")]
     public async Task<EmbeddingsResponse> GetEmbeddings(EmbeddingsRequest embeddingsRequest, CancellationToken cancellationToken)
     {
         return await PostAsJsonAsync<EmbeddingsResponse, EmbeddingsRequest>("embeddings", embeddingsRequest, default, cancellationToken);
+    }
+
+    public async Task<EmbedResponse> Embed(EmbedRequest embedRequest, CancellationToken cancellationToken)
+    {
+        return await PostAsJsonAsync<EmbedResponse, EmbedRequest>("embed", embedRequest, default, cancellationToken);
     }
 
     public async Task<GetModelsResponse> GetModels(CancellationToken cancellationToken)

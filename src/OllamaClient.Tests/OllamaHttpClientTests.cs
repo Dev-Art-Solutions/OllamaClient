@@ -204,6 +204,7 @@ public class OllamaHttpClientTests
     }
 
     [Fact]
+#pragma warning disable CS0618
     public async Task GetEmbeddings_ReturnsValidResponse()
     {
         // Arrange
@@ -234,6 +235,42 @@ public class OllamaHttpClientTests
         // Assert
         Assert.NotNull(response);
         Assert.Equivalent(expectedResponse, response);
+    }
+#pragma warning restore CS0618
+
+    [Fact]
+    public async Task Embed_ReturnsValidResponse()
+    {
+        // Arrange
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+
+        var expectedResponse = new EmbedResponse
+        {
+            Model = "llama3.1",
+            Embeddings = [[0.1f, 0.2f, 0.3f], [0.4f, 0.5f, 0.6f]]
+        };
+
+        var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(expectedResponse))
+        });
+        var httpClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://localhost:11434/") };
+        httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
+
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
+        var request = new EmbedRequest
+        {
+            Model = "llama3.1",
+            Input = System.Text.Json.JsonSerializer.SerializeToElement(new[] { "Hello", "World" })
+        };
+
+        // Act
+        var response = await ollamaClient.Embed(request, default);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(2, response.Embeddings.Count);
+        Assert.Equal(3, response.Embeddings[0].Count);
     }
 
     [Fact]

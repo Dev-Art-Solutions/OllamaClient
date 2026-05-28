@@ -119,10 +119,20 @@ public interface IOllamaHttpClient
     IAsyncEnumerable<PushResponse> Push(PushStreamRequest pushRequest, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Generate embeddings from a model
+    /// Generate embeddings from a model using the legacy <c>/api/embeddings</c> endpoint.
     /// </summary>
     /// <param name="embeddingsRequest">Embeddings Request</param>
     /// <param name="cancellationToken">Cancellation Token</param>
     /// <returns>Embeddings Response</returns>
+    [Obsolete("Use Embed(EmbedRequest, CancellationToken) instead. The /api/embeddings endpoint is legacy and does not support batch input.")]
     Task<EmbeddingsResponse> GetEmbeddings(EmbeddingsRequest embeddingsRequest, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Generate embeddings from a model using the current <c>/api/embed</c> endpoint.
+    /// Supports a single string or a list of strings as input.
+    /// </summary>
+    /// <param name="embedRequest">Embed Request</param>
+    /// <param name="cancellationToken">Cancellation Token</param>
+    /// <returns>Embed Response containing one float array per input text</returns>
+    Task<EmbedResponse> Embed(EmbedRequest embedRequest, CancellationToken cancellationToken);
 }
