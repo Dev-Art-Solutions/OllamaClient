@@ -54,4 +54,11 @@ public class ChatRequest : StreamingRequest
     [JsonPropertyName("tools")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<Tool>? Tools { get; set; }
+
+    /// <summary>
+    /// think: if true, the model will think before responding (for reasoning models)
+    /// </summary>
+    [JsonPropertyName("think")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? Think { get; set; }
 }

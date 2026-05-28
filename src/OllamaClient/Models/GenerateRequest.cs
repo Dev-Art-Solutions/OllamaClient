@@ -72,11 +72,25 @@ public class GenerateRequest : StreamingRequest
     public string? Template { get; set; }
 
     /// <summary>
-    /// context: the context parameter returned from a previous request to /generate, this can be used to keep a short conversational memory
+    /// suffix: the text to insert after the model's response (fill-in-the-middle)
+    /// </summary>
+    [JsonPropertyName("suffix")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Suffix { get; set; }
+
+    /// <summary>
+    /// context: token IDs returned from a previous /generate response, used to keep a short conversational memory
     /// </summary>
     [JsonPropertyName("context")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Context { get; set; }
+    public int[]? Context { get; set; }
+
+    /// <summary>
+    /// think: if true, the model will think before responding (for reasoning models)
+    /// </summary>
+    [JsonPropertyName("think")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? Think { get; set; }
 
     /// <summary>
     /// stream: if false the response will be returned as a single response object, rather than a stream of objects

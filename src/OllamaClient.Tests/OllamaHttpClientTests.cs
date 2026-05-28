@@ -292,7 +292,7 @@ public class OllamaHttpClientTests
         var generateRequest = new GenerateRequest()
         {
             System = "System",
-            Context = "context",
+            Context = [42, 43],
             Format = System.Text.Json.JsonSerializer.SerializeToElement("json"),
             Images = ["image"],
             KeepAlive = "5m",
@@ -339,7 +339,7 @@ public class OllamaHttpClientTests
         var generateRequest = new GenerateStreamRequest()
         {
             System = "System",
-            Context = "context",
+            Context = [42, 43],
             Format = System.Text.Json.JsonSerializer.SerializeToElement("json"),
             Images = ["image"],
             KeepAlive = "5m",
