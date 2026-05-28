@@ -204,6 +204,7 @@ public class OllamaHttpClientTests
     }
 
     [Fact]
+#pragma warning disable CS0618
     public async Task GetEmbeddings_ReturnsValidResponse()
     {
         // Arrange
@@ -235,6 +236,42 @@ public class OllamaHttpClientTests
         Assert.NotNull(response);
         Assert.Equivalent(expectedResponse, response);
     }
+#pragma warning restore CS0618
+
+    [Fact]
+    public async Task Embed_ReturnsValidResponse()
+    {
+        // Arrange
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+
+        var expectedResponse = new EmbedResponse
+        {
+            Model = "llama3.1",
+            Embeddings = [[0.1f, 0.2f, 0.3f], [0.4f, 0.5f, 0.6f]]
+        };
+
+        var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(expectedResponse))
+        });
+        var httpClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://localhost:11434/") };
+        httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
+
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
+        var request = new EmbedRequest
+        {
+            Model = "llama3.1",
+            Input = System.Text.Json.JsonSerializer.SerializeToElement(new[] { "Hello", "World" })
+        };
+
+        // Act
+        var response = await ollamaClient.Embed(request, default);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal(2, response.Embeddings.Count);
+        Assert.Equal(3, response.Embeddings[0].Count);
+    }
 
     [Fact]
     public async Task Generate_ReturnsValidResponse()
@@ -255,8 +292,8 @@ public class OllamaHttpClientTests
         var generateRequest = new GenerateRequest()
         {
             System = "System",
-            Context = "context",
-            Format = "json",
+            Context = [42, 43],
+            Format = System.Text.Json.JsonSerializer.SerializeToElement("json"),
             Images = ["image"],
             KeepAlive = "5m",
             Model = "model",
@@ -302,8 +339,8 @@ public class OllamaHttpClientTests
         var generateRequest = new GenerateStreamRequest()
         {
             System = "System",
-            Context = "context",
-            Format = "json",
+            Context = [42, 43],
+            Format = System.Text.Json.JsonSerializer.SerializeToElement("json"),
             Images = ["image"],
             KeepAlive = "5m",
             Model = "model",
@@ -542,7 +579,7 @@ public class OllamaHttpClientTests
         var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var chatRequest = new ChatRequest()
         {
-            Format = "format",
+            Format = System.Text.Json.JsonSerializer.SerializeToElement("format"),
             KeepAlive = "5m",
             Messages = [new() { Content = "content" }],
             Model = "model",
@@ -661,6 +698,126 @@ public class OllamaHttpClientTests
             {
             }
         });
+    }
+
+    [Fact]
+    public async Task SendChat_WithTools_SerializesToolsAndDeserializesToolCalls()
+    {
+        // Arrange
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+
+        var toolCallJson = """
+            {
+              "model": "llama3.1",
+              "created_at": "2024-07-22T00:00:00Z",
+              "message": {
+                "role": "assistant",
+                "content": "",
+                "tool_calls": [
+                  {
+                    "function": {
+                      "name": "get_current_weather",
+                      "arguments": { "location": "Tokyo", "unit": "celsius" }
+                    }
+                  }
+                ]
+              },
+              "done": true
+            }
+            """;
+
+        var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(toolCallJson)
+        });
+        var httpClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://localhost:11434/") };
+        httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
+
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
+
+        var request = new ChatRequest
+        {
+            Model = "llama3.1",
+            Messages = [new Message { Role = "user", Content = "What is the weather in Tokyo?" }],
+            Tools =
+            [
+                new Tool
+                {
+                    Function = new FunctionDefinition
+                    {
+                        Name = "get_current_weather",
+                        Description = "Get weather for a location",
+                        Parameters = System.Text.Json.JsonSerializer.SerializeToElement(new
+                        {
+                            type = "object",
+                            properties = new { location = new { type = "string" } },
+                            required = new[] { "location" }
+                        })
+                    }
+                }
+            ]
+        };
+
+        // Act
+        var response = await ollamaClient.SendChat(request, default);
+
+        // Assert
+        Assert.NotNull(response.Message);
+        Assert.NotNull(response.Message.ToolCalls);
+        Assert.Single(response.Message.ToolCalls);
+        Assert.Equal("get_current_weather", response.Message.ToolCalls[0].Function.Name);
+    }
+
+    [Fact]
+    public async Task GetVersion_ReturnsValidResponse()
+    {
+        // Arrange
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        var expectedResponse = new VersionResponse { Version = "0.6.1" };
+
+        var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(expectedResponse))
+        });
+        var httpClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://localhost:11434/") };
+        httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
+
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
+
+        // Act
+        var response = await ollamaClient.GetVersion(default);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Equal("0.6.1", response.Version);
+    }
+
+    [Fact]
+    public async Task GetRunningModels_ReturnsValidResponse()
+    {
+        // Arrange
+        var httpClientFactoryMock = new Mock<IHttpClientFactory>();
+        var expectedResponse = new PsResponse
+        {
+            Models = [new RunningModelResponse { Name = "llama3.1:latest", Model = "llama3.1:latest", Size = 1234 }]
+        };
+
+        var fakeHttpMessageHandler = new FakeHttpMessageHandler(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(System.Text.Json.JsonSerializer.Serialize(expectedResponse))
+        });
+        var httpClient = new HttpClient(fakeHttpMessageHandler) { BaseAddress = new Uri("http://localhost:11434/") };
+        httpClientFactoryMock.Setup(_ => _.CreateClient(It.IsAny<string>())).Returns(httpClient);
+
+        var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
+
+        // Act
+        var response = await ollamaClient.GetRunningModels(default);
+
+        // Assert
+        Assert.NotNull(response);
+        Assert.Single(response.Models);
+        Assert.Equal("llama3.1:latest", response.Models[0].Name);
     }
 
     [Fact]

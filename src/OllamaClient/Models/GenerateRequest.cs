@@ -1,5 +1,6 @@
 ﻿namespace OllamaClient.Models;
 
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 /// <summary>
@@ -27,13 +28,13 @@ public class GenerateRequest : StreamingRequest
     public bool? Raw { get; set; }
 
     /// <summary>
-    /// format: the format to return a response in. Currently the only accepted value is json. Enable JSON mode by setting the format parameter to json. 
-    /// This will structure the response as a valid JSON object. 
-    /// Note: it's important to instruct the model to use JSON in the prompt. Otherwise, the model may generate large amounts whitespace.
+    /// format: the format to return a response in. Pass the string "json" for unstructured JSON mode,
+    /// or a JSON Schema object (as a <see cref="JsonElement"/>) for structured outputs.
+    /// Note: instruct the model to use JSON in the prompt; otherwise it may generate excessive whitespace.
     /// </summary>
     [JsonPropertyName("format")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Format { get; set; }
+    public JsonElement? Format { get; set; }
 
     /// <summary>
     /// images: (optional) a list of base64-encoded images (for multimodal models such as llava)
@@ -71,11 +72,25 @@ public class GenerateRequest : StreamingRequest
     public string? Template { get; set; }
 
     /// <summary>
-    /// context: the context parameter returned from a previous request to /generate, this can be used to keep a short conversational memory
+    /// suffix: the text to insert after the model's response (fill-in-the-middle)
+    /// </summary>
+    [JsonPropertyName("suffix")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Suffix { get; set; }
+
+    /// <summary>
+    /// context: token IDs returned from a previous /generate response, used to keep a short conversational memory
     /// </summary>
     [JsonPropertyName("context")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Context { get; set; }
+    public int[]? Context { get; set; }
+
+    /// <summary>
+    /// think: if true, the model will think before responding (for reasoning models)
+    /// </summary>
+    [JsonPropertyName("think")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? Think { get; set; }
 
     /// <summary>
     /// stream: if false the response will be returned as a single response object, rather than a stream of objects

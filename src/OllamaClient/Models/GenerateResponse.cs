@@ -26,6 +26,13 @@ public class GenerateResponse
     public string Response { get; set; } = default!;
 
     /// <summary>
+    /// thinking: the reasoning trace produced before the response (only present when think=true)
+    /// </summary>
+    [JsonPropertyName("thinking")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Thinking { get; set; }
+
+    /// <summary>
     /// done: true if the request is done(used by streaming to indicate the last message)
     /// </summary>
     [JsonPropertyName("done")]

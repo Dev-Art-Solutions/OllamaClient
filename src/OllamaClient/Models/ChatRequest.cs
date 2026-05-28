@@ -1,5 +1,6 @@
 ﻿namespace OllamaClient.Models;
 
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 /// <summary>
@@ -26,11 +27,12 @@ public class ChatRequest : StreamingRequest
     public List<Message> Messages { get; set; } = [];
 
     /// <summary>
-    /// format: the format to return a response in. Currently the only accepted value is json
+    /// format: the format to return a response in. Pass the string "json" for unstructured JSON mode,
+    /// or a JSON Schema object (as a <see cref="JsonElement"/>) for structured outputs.
     /// </summary>
     [JsonPropertyName("format")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Format { get; set; }
+    public JsonElement? Format { get; set; }
 
     /// <summary>
     /// options: additional model parameters listed in the documentation for the Modelfile such as temperature
@@ -45,4 +47,18 @@ public class ChatRequest : StreamingRequest
     [JsonPropertyName("keep_alive")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? KeepAlive { get; set; }
+
+    /// <summary>
+    /// tools (optional): list of tools the model may call; requires a model that supports tool calling
+    /// </summary>
+    [JsonPropertyName("tools")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<Tool>? Tools { get; set; }
+
+    /// <summary>
+    /// think: if true, the model will think before responding (for reasoning models)
+    /// </summary>
+    [JsonPropertyName("think")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? Think { get; set; }
 }

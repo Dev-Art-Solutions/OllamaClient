@@ -25,4 +25,11 @@ public class Message
     [JsonPropertyName("images")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<string>? Images { get; set; }
+
+    /// <summary>
+    /// tool_calls (optional): tool calls the model wants to make; present when the model invokes a function
+    /// </summary>
+    [JsonPropertyName("tool_calls")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<ToolCall>? ToolCalls { get; set; }
 }

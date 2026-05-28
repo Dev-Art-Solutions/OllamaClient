@@ -28,7 +28,39 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
 
     public async Task<DeleteResponse> Delete(DeleteRequest deleteRequest, CancellationToken cancellationToken)
     {
-        return await PostAsJsonAsync("delete", deleteRequest, (response) => new DeleteResponse() { IsSuccessful = response!.IsSuccessStatusCode }, cancellationToken);
+        using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
+        var request = new HttpRequestMessage(HttpMethod.Delete, "api/delete")
+        {
+            Content = System.Net.Http.Json.JsonContent.Create(deleteRequest)
+        };
+        var response = await httpClient.SendAsync(request, cancellationToken);
+        return new DeleteResponse { IsSuccessful = response.IsSuccessStatusCode };
+    }
+
+    public async Task<VersionResponse> GetVersion(CancellationToken cancellationToken)
+    {
+        using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
+        var response = await httpClient.GetAsync("api/version", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new OllamaException(await response.Content.ReadAsStringAsync());
+        }
+
+        return (await response.Content.ReadFromJsonAsync<VersionResponse>(cancellationToken))!;
+    }
+
+    public async Task<PsResponse> GetRunningModels(CancellationToken cancellationToken)
+    {
+        using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
+        var response = await httpClient.GetAsync("api/ps", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new OllamaException(await response.Content.ReadAsStringAsync());
+        }
+
+        return (await response.Content.ReadFromJsonAsync<PsResponse>(cancellationToken))!;
     }
 
     public async Task<GenerateResponse> Generate(GenerateRequest request, CancellationToken cancellationToken)
@@ -41,9 +73,15 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
         return StreamingPostAsJsonAsync<GenerateResponse, GenerateStreamRequest>("generate", request, cancellationToken);
     }
 
+    [Obsolete("Use Embed(EmbedRequest, CancellationToken) instead. The /api/embeddings endpoint is legacy and does not support batch input.")]
     public async Task<EmbeddingsResponse> GetEmbeddings(EmbeddingsRequest embeddingsRequest, CancellationToken cancellationToken)
     {
         return await PostAsJsonAsync<EmbeddingsResponse, EmbeddingsRequest>("embeddings", embeddingsRequest, default, cancellationToken);
+    }
+
+    public async Task<EmbedResponse> Embed(EmbedRequest embedRequest, CancellationToken cancellationToken)
+    {
+        return await PostAsJsonAsync<EmbedResponse, EmbedRequest>("embed", embedRequest, default, cancellationToken);
     }
 
     public async Task<GetModelsResponse> GetModels(CancellationToken cancellationToken)
