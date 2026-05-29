@@ -9,23 +9,28 @@ using Models;
 using Extensions;
 using OllamaClient.Exceptions;
 
+/// <inheritdoc cref="IOllamaHttpClient"/>
 public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHttpClient
 {
+    /// <inheritdoc/>
     public async Task<CopyResponse> Copy(CopyRequest copyRequest, CancellationToken cancellationToken)
     {
         return await PostAsJsonAsync("copy", copyRequest, (response) => new CopyResponse() { IsSuccessful = response!.IsSuccessStatusCode }, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public async Task<CreateModelResponse> Create(CreateModelRequest request, CancellationToken cancellationToken)
     {
         return await PostAsJsonAsync<CreateModelResponse, CreateModelRequest>("create", request, null, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public IAsyncEnumerable<CreateModelResponse> Create(CreateModelStreamRequest request, CancellationToken cancellationToken)
     {
         return StreamingPostAsJsonAsync<CreateModelResponse, CreateModelStreamRequest>("create", request, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public async Task<DeleteResponse> Delete(DeleteRequest deleteRequest, CancellationToken cancellationToken)
     {
         using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
@@ -37,6 +42,7 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
         return new DeleteResponse { IsSuccessful = response.IsSuccessStatusCode };
     }
 
+    /// <inheritdoc/>
     public async Task<VersionResponse> GetVersion(CancellationToken cancellationToken)
     {
         using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
@@ -50,6 +56,7 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
         return (await response.Content.ReadFromJsonAsync<VersionResponse>(cancellationToken))!;
     }
 
+    /// <inheritdoc/>
     public async Task<PsResponse> GetRunningModels(CancellationToken cancellationToken)
     {
         using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
@@ -63,27 +70,32 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
         return (await response.Content.ReadFromJsonAsync<PsResponse>(cancellationToken))!;
     }
 
+    /// <inheritdoc/>
     public async Task<GenerateResponse> Generate(GenerateRequest request, CancellationToken cancellationToken)
     {
         return await PostAsJsonAsync<GenerateResponse, GenerateRequest>("generate", request, null, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public IAsyncEnumerable<GenerateResponse> Generate(GenerateStreamRequest request, CancellationToken cancellationToken)
     {
         return StreamingPostAsJsonAsync<GenerateResponse, GenerateStreamRequest>("generate", request, cancellationToken);
     }
 
+    /// <inheritdoc/>
     [Obsolete("Use Embed(EmbedRequest, CancellationToken) instead. The /api/embeddings endpoint is legacy and does not support batch input.")]
     public async Task<EmbeddingsResponse> GetEmbeddings(EmbeddingsRequest embeddingsRequest, CancellationToken cancellationToken)
     {
         return await PostAsJsonAsync<EmbeddingsResponse, EmbeddingsRequest>("embeddings", embeddingsRequest, default, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public async Task<EmbedResponse> Embed(EmbedRequest embedRequest, CancellationToken cancellationToken)
     {
         return await PostAsJsonAsync<EmbedResponse, EmbedRequest>("embed", embedRequest, default, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public async Task<GetModelsResponse> GetModels(CancellationToken cancellationToken)
     {
         using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
@@ -97,36 +109,43 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
         return (await response.Content.ReadFromJsonAsync<GetModelsResponse>())!;
     }
 
+    /// <inheritdoc/>
     public async Task<PullResponse> Pull(PullRequest pullRequest, CancellationToken cancellationToken)
     {
         return await PostAsJsonAsync<PullResponse, PullRequest>("pull", pullRequest, null, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public IAsyncEnumerable<PullResponse> Pull(PullStreamRequest pullRequest, CancellationToken cancellationToken)
     {
         return StreamingPostAsJsonAsync<PullResponse, PullStreamRequest>("pull", pullRequest, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public async Task<PushResponse> Push(PushRequest pushRequest, CancellationToken cancellationToken)
     {
         return await PostAsJsonAsync<PushResponse, PushRequest>("push", pushRequest, null, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public IAsyncEnumerable<PushResponse> Push(PushStreamRequest pushRequest, CancellationToken cancellationToken)
     {
         return StreamingPostAsJsonAsync<PushResponse, PushStreamRequest>("push", pushRequest, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public async Task<ChatResponse> SendChat(ChatRequest chatRequest, CancellationToken cancellationToken)
     {
         return await PostAsJsonAsync<ChatResponse, ChatRequest>("chat", chatRequest, default, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public IAsyncEnumerable<ChatResponse> SendChat(ChatStreamRequest chatRequest, CancellationToken cancellationToken)
     {
         return StreamingPostAsJsonAsync<ChatResponse, ChatStreamRequest>("chat", chatRequest, cancellationToken);
     }
 
+    /// <inheritdoc/>
     public async Task<ShowResponse> Show(ShowRequest showRequest, CancellationToken cancellationToken)
     {
         return await PostAsJsonAsync<ShowResponse, ShowRequest>("show", showRequest, null, cancellationToken);

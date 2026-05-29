@@ -2,6 +2,9 @@
 
 using System.Text.Json.Serialization;
 
+/// <summary>
+/// Base class for requests that support both streaming and non-streaming response modes.
+/// </summary>
 public abstract class StreamingRequest
 {
     /// <summary>
