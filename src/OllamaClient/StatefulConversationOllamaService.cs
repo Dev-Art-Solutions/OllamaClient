@@ -6,10 +6,12 @@ using System.Runtime.CompilerServices;
 
 using Models;
 
+/// <inheritdoc cref="IStatefulConversationOllamaService"/>
 public class StatefulConversationOllamaService(IOllamaHttpClient ollamaClient) : IStatefulConversationOllamaService
 {
     private readonly ConcurrentDictionary<Guid, List<Message>> Conversations = new();
 
+    /// <inheritdoc/>
     public async Task<ChatResponse> SendChat(ConversationChatStreamlessRequest chatRequest, CancellationToken cancellationToken)
     {
         if (!Conversations.TryGetValue(chatRequest.ConversationId, out var messages))
@@ -30,6 +32,7 @@ public class StatefulConversationOllamaService(IOllamaHttpClient ollamaClient) :
         return response;
     }
 
+    /// <inheritdoc/>
     public async IAsyncEnumerable<ChatResponse> SendChat(ConversationChatStreamRequest chatRequest, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         if (!Conversations.TryGetValue(chatRequest.ConversationId, out var messages))
