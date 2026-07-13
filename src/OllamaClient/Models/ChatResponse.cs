@@ -61,11 +61,13 @@ public class ChatResponse
     public int? PromptEvalCount { get; set; }
 
     /// <summary>
-    /// prompt_eval_duration: time spent in nanoseconds evaluating the prompt
+    /// prompt_eval_duration: time spent in nanoseconds evaluating the prompt.
+    /// Nanoseconds overflow Int32 after ~2.1 seconds, so this must stay a long —
+    /// as int? it threw a JsonException on any prompt that took longer than that.
     /// </summary>
     [JsonPropertyName("prompt_eval_duration")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int? PromptEvalDuration { get; set; }
+    public long? PromptEvalDuration { get; set; }
 
     /// <summary>
     /// eval_count: number of tokens the response

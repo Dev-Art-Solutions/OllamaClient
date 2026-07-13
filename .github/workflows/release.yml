@@ -1,0 +1,58 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: Action
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+
+      # net9.0 is one of the target frameworks, so its SDK has to be present to pack.
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+
+      - name: Resolve version from tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Restore
+        run: dotnet restore src/OllamaClient/OllamaClient.csproj
+
+      # PackageVersion is set in the csproj, so it must be overridden explicitly too —
+      # /p:Version alone would not win, and the tag is what we want to be authoritative.
+      - name: Build
+        run: >-
+          dotnet build src/OllamaClient/OllamaClient.csproj --configuration Release --no-restore
+          /p:Version=${{ steps.version.outputs.version }}
+          /p:PackageVersion=${{ steps.version.outputs.version }}
+
+      - name: Pack
+        run: >-
+          dotnet pack src/OllamaClient/OllamaClient.csproj --configuration Release --no-build --output ./nupkgs
+          /p:Version=${{ steps.version.outputs.version }}
+          /p:PackageVersion=${{ steps.version.outputs.version }}
+
+      - name: Push to NuGet
+        run: dotnet nuget push "./nupkgs/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./nupkgs/*.nupkg
+          generate_release_notes: true

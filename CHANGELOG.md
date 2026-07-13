@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-07-13
+
+### Fixed
+- `ChatResponse.PromptEvalDuration` and `GenerateResponse.PromptEvalDuration` were typed
+  `int?`, but Ollama reports durations in **nanoseconds** — Int32 overflows after ~2.1
+  seconds. Any prompt that took longer to evaluate (which a cold model always does) failed
+  to deserialize with `JsonException: The JSON value could not be converted to
+  System.Nullable\`1[System.Int32]. Path: $.prompt_eval_duration`, so the whole response was
+  lost even though the model had answered correctly. Both are now `long?`, matching every
+  other duration field on those types.
+
 ## [2.0.0] - 2026-05-31
 
 ### Added
