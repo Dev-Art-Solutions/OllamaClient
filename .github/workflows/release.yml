@@ -24,6 +24,16 @@ jobs:
             9.0.x
             10.0.x
 
+      # Fail loudly and early. An unset key makes `dotnet nuget push --api-key ` swallow the
+      # next argument, and the job dies at the very end with the baffling
+      # "Source parameter was not specified" instead of "your secret is missing".
+      - name: Verify the NuGet key is present
+        run: |
+          if [ -z "${{ secrets.NUGET_API_KEY }}" ]; then
+            echo "::error::NUGET_API_KEY is not set. Add it to this repository (or to the 'Action' environment): gh secret set NUGET_API_KEY --repo Dev-Art-Solutions/OllamaClient --env Action"
+            exit 1
+          fi
+
       - name: Resolve version from tag
         id: version
         run: |
@@ -48,8 +58,9 @@ jobs:
           /p:Version=${{ steps.version.outputs.version }}
           /p:PackageVersion=${{ steps.version.outputs.version }}
 
+      # Quote the key: unquoted and empty, it eats the next flag.
       - name: Push to NuGet
-        run: dotnet nuget push "./nupkgs/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push "./nupkgs/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
