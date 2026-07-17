@@ -18,7 +18,7 @@ jobs:
 
       # net9.0 is one of the target frameworks, so its SDK has to be present to pack.
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: |
             9.0.x
