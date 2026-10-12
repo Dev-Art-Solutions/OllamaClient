@@ -15,7 +15,7 @@ public class EmbedRequest
     public string Model { get; set; } = default!;
 
     /// <summary>
-    /// input: text or list of texts to embed. Use <see cref="JsonSerializer.SerializeToElement"/> to build the value:
+    /// input: text or list of texts to embed. Use <c>JsonSerializer.SerializeToElement</c> to build the value:
     /// <code>
     /// Input = JsonSerializer.SerializeToElement("single string")
     /// Input = JsonSerializer.SerializeToElement(new[] { "text1", "text2" })
