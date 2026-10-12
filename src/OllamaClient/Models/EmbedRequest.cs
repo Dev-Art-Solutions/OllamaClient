@@ -15,7 +15,7 @@ public class EmbedRequest
     public string Model { get; set; } = default!;
 
     /// <summary>
-    /// input: text or list of texts to embed. Use <see cref="JsonSerializer.SerializeToElement"/> to build the value:
+    /// input: text or list of texts to embed. Use <c>JsonSerializer.SerializeToElement</c> to build the value:
     /// <code>
     /// Input = JsonSerializer.SerializeToElement("single string")
     /// Input = JsonSerializer.SerializeToElement(new[] { "text1", "text2" })
@@ -30,6 +30,13 @@ public class EmbedRequest
     [JsonPropertyName("truncate")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? Truncate { get; set; }
+
+    /// <summary>
+    /// dimensions: number of dimensions to return, for models that support truncating their embeddings (Matryoshka)
+    /// </summary>
+    [JsonPropertyName("dimensions")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? Dimensions { get; set; }
 
     /// <summary>
     /// options: additional model parameters such as temperature

@@ -8,9 +8,9 @@ using System.Text.Json.Serialization;
 public class EmbeddingsResponse
 {
     /// <summary>
-    /// Embeddings array
+    /// embedding: the embedding vector
     /// </summary>
-    [JsonPropertyName("embeddings")]
+    [JsonPropertyName("embedding")]
     public decimal[] Embedding { get; set; } = [];
 }
 

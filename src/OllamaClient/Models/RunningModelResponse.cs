@@ -1,4 +1,4 @@
-namespace OllamaClient.Models;
+﻿namespace OllamaClient.Models;
 
 using System.Text.Json.Serialization;
 
@@ -50,4 +50,11 @@ public class RunningModelResponse
     /// </summary>
     [JsonPropertyName("size_vram")]
     public long SizeVram { get; set; }
+
+    /// <summary>
+    /// context_length: the context length the model was loaded with, in tokens
+    /// </summary>
+    [JsonPropertyName("context_length")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? ContextLength { get; set; }
 }

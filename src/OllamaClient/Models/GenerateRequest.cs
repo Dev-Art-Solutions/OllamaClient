@@ -86,11 +86,40 @@ public class GenerateRequest : StreamingRequest
     public int[]? Context { get; set; }
 
     /// <summary>
-    /// think: if true, the model will think before responding (for reasoning models)
+    /// think: enables thinking for reasoning models. Either a boolean, or an effort level
+    /// ("low", "medium", "high", "max") for models that support it. The trace is returned in <see cref="GenerateResponse.Thinking"/>.
     /// </summary>
     [JsonPropertyName("think")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public bool? Think { get; set; }
+    public ThinkValue? Think { get; set; }
+
+    /// <summary>
+    /// truncate: if true (the server default), truncate the prompt from the start when it exceeds the context length; if false, return an error instead
+    /// </summary>
+    [JsonPropertyName("truncate")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? Truncate { get; set; }
+
+    /// <summary>
+    /// shift: if true (the server default), shift the context window when generation reaches the context length; if false, stop generating instead
+    /// </summary>
+    [JsonPropertyName("shift")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? Shift { get; set; }
+
+    /// <summary>
+    /// logprobs: if true, return log probabilities of the generated tokens in <see cref="GenerateResponse.Logprobs"/>
+    /// </summary>
+    [JsonPropertyName("logprobs")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? Logprobs { get; set; }
+
+    /// <summary>
+    /// top_logprobs: number of most likely alternative tokens (0-20) to return at each position; requires <see cref="Logprobs"/>
+    /// </summary>
+    [JsonPropertyName("top_logprobs")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? TopLogprobs { get; set; }
 
     /// <summary>
     /// stream: if false the response will be returned as a single response object, rather than a stream of objects

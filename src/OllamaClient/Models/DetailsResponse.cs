@@ -41,4 +41,25 @@ public class DetailsResponse
     [JsonPropertyName("quantization_level")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? QuantizationLevel { get; set; }
+
+    /// <summary>
+    /// parent_model: the model this model was created from
+    /// </summary>
+    [JsonPropertyName("parent_model")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ParentModel { get; set; }
+
+    /// <summary>
+    /// context_length: maximum context length the model supports, in tokens
+    /// </summary>
+    [JsonPropertyName("context_length")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? ContextLength { get; set; }
+
+    /// <summary>
+    /// embedding_length: size of the model's embedding vectors
+    /// </summary>
+    [JsonPropertyName("embedding_length")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? EmbeddingLength { get; set; }
 }

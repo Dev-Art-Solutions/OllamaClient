@@ -9,6 +9,12 @@ using System.Text.Json.Serialization;
 public class FunctionCall
 {
     /// <summary>
+    /// index: position of this call among the tool calls in the same message
+    /// </summary>
+    [JsonPropertyName("index")]
+    public int Index { get; set; }
+
+    /// <summary>
     /// name: name of the function to call
     /// </summary>
     [JsonPropertyName("name")]
