@@ -27,6 +27,7 @@ Ollama server, not only against fixtures.
 - `Model` on `DeleteRequest`, `ShowRequest`, `PullRequest` and `PushRequest`. Ollama has deprecated `name`, but the server still falls back to it, so `Name` keeps working.
 
 ### Fixed
+- `StatefulConversationOllamaService` never sent the conversation history: it recorded every turn but sent only the new messages, so the model forgot everything between turns. It now sends the full history, stores a streamed reply as one assistant message instead of one message per chunk, and records a turn only once it succeeds.
 - `GetEmbeddings()` always returned an empty vector: `/api/embeddings` answers with `embedding`, and the client read `embeddings`.
 - `ChatResponse.Thinking` was always null: Ollama returns the chat reasoning trace on the message. The property is now obsolete and forwards to `Message.Thinking`.
 - `Create()` with a `Modelfile` fails on any current Ollama with "neither 'from' or 'files' was specified". `Modelfile` and `Path` are now obsolete and point to the new fields.
