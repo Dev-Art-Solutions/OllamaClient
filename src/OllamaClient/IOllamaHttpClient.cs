@@ -8,7 +8,8 @@ using Models;
 public interface IOllamaHttpClient
 {
     /// <summary>
-    /// Create a model from a Modelfile. It is recommended to set modelfile to the content of the Modelfile rather than just set path. This is a requirement for remote create. Remote model creation must also create any file blobs, fields such as FROM and ADAPTER, explicitly with the server using Create a Blob and the value to the path indicated in the response.
+    /// Create a model from an existing model (<see cref="CreateModelRequest.From"/>) or from GGUF/safetensors files
+    /// (<see cref="CreateModelRequest.Files"/>). Files must be uploaded first with <see cref="PushBlob"/>.
     /// </summary>
     /// <param name="request">Create Model Request</param>
     /// <param name="cancellationToken">Cancellation Token</param>
@@ -16,7 +17,8 @@ public interface IOllamaHttpClient
     Task<CreateModelResponse> Create(CreateModelRequest request, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Create a model from a Modelfile. It is recommended to set modelfile to the content of the Modelfile rather than just set path. This is a requirement for remote create. Remote model creation must also create any file blobs, fields such as FROM and ADAPTER, explicitly with the server using Create a Blob and the value to the path indicated in the response.
+    /// Create a model from an existing model (<see cref="CreateModelRequest.From"/>) or from GGUF/safetensors files
+    /// (<see cref="CreateModelRequest.Files"/>), streaming the progress. Files must be uploaded first with <see cref="PushBlob"/>.
     /// </summary>
     /// <param name="request">Create Model Request</param>
     /// <param name="cancellationToken">Cancellation Token</param>
@@ -131,6 +133,30 @@ public interface IOllamaHttpClient
     /// <param name="cancellationToken">Cancellation Token</param>
     /// <returns>Running models</returns>
     Task<PsResponse> GetRunningModels(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Get the server status, e.g. whether cloud models are available.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation Token</param>
+    /// <returns>Status response</returns>
+    Task<StatusResponse> GetStatus(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Check whether a file blob exists on the server. Used before <see cref="PushBlob"/> to skip uploads the server already has.
+    /// </summary>
+    /// <param name="digest">SHA256 digest of the blob, in the form "sha256:&lt;hex&gt;"</param>
+    /// <param name="cancellationToken">Cancellation Token</param>
+    /// <returns>True if the blob exists</returns>
+    Task<bool> BlobExists(string digest, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Upload a file (e.g. a GGUF or safetensors file) to the server as a blob, so it can be referenced in
+    /// <see cref="CreateModelRequest.Files"/>. The server rejects the upload if the content does not match the digest.
+    /// </summary>
+    /// <param name="digest">SHA256 digest of the content, in the form "sha256:&lt;hex&gt;"</param>
+    /// <param name="content">The file content</param>
+    /// <param name="cancellationToken">Cancellation Token</param>
+    Task PushBlob(string digest, Stream content, CancellationToken cancellationToken);
 
     /// <summary>
     /// Generate embeddings from a model using the legacy <c>/api/embeddings</c> endpoint.

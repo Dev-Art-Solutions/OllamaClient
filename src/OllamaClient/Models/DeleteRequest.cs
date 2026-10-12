@@ -8,8 +8,16 @@ using System.Text.Json.Serialization;
 public class DeleteRequest
 {
     /// <summary>
-    /// name: model name to delete
+    /// model: name of the model
+    /// </summary>
+    [JsonPropertyName("model")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Model { get; set; }
+
+    /// <summary>
+    /// name: legacy alias of <see cref="Model"/>; the server uses it only when <see cref="Model"/> is empty
     /// </summary>
     [JsonPropertyName("name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string Name { get; set; } = default!;
 }

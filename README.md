@@ -50,12 +50,51 @@ await foreach (var chunk in client.SendChat(new ChatStreamRequest
 | `POST /api/generate` | `Generate()` | `Generate(GenerateStreamRequest)` |
 | `POST /api/chat` | `SendChat()` | `SendChat(ChatStreamRequest)` |
 | `POST /api/create` | `Create()` | `Create(CreateModelStreamRequest)` |
+| `HEAD /api/blobs/:digest` | `BlobExists()` | — |
+| `POST /api/blobs/:digest` | `PushBlob()` | — |
 | `POST /api/copy` | `Copy()` | — |
-| `POST /api/delete` | `Delete()` | — |
+| `DELETE /api/delete` | `Delete()` | — |
 | `POST /api/show` | `Show()` | — |
 | `POST /api/pull` | `Pull()` | `Pull(PullStreamRequest)` |
 | `POST /api/push` | `Push()` | `Push(PushStreamRequest)` |
-| `POST /api/embeddings` | `GetEmbeddings()` | — |
+| `POST /api/embed` | `Embed()` | — |
+| `POST /api/embeddings` | `GetEmbeddings()` (obsolete) | — |
+| `GET /api/ps` | `GetRunningModels()` | — |
+| `GET /api/version` | `GetVersion()` | — |
+| `GET /api/status` | `GetStatus()` | — |
+
+Also covered: tool calling (with tool-call ids), structured outputs, images, thinking (`Think = true` or an effort level such as `ThinkValue.High`), token log probabilities (`Logprobs`, `TopLogprobs`), `done_reason`, and cloud-model metadata.
+
+### Thinking and log probabilities
+
+```csharp
+var response = await client.SendChat(new ChatRequest
+{
+    Model = "qwen3",
+    Messages = [new() { Role = "user", Content = "Is 9.11 bigger than 9.9?" }],
+    Think = ThinkValue.Low,      // or true / false
+    Logprobs = true,
+    TopLogprobs = 3,
+}, ct);
+
+Console.WriteLine(response.Message!.Thinking);  // the reasoning trace
+Console.WriteLine(response.Message.Content);    // the answer
+Console.WriteLine(response.DoneReason);         // "stop" or "length"
+```
+
+### Creating a model
+
+`/api/create` no longer takes a Modelfile. Derive from an existing model, or upload GGUF/safetensors files as blobs first:
+
+```csharp
+await client.Create(new CreateModelRequest
+{
+    Model = "mario",
+    From = "llama3.2",
+    System = "You are Mario from Super Mario Bros.",
+    Parameters = new() { ["temperature"] = 0.7 },
+}, ct);
+```
 
 **Stateful multi-turn chat** is available via `IStatefulConversationOllamaService`, which manages message history automatically across turns.
 
@@ -95,6 +134,8 @@ See [`src/OllamaClient.QuickStart/`](src/OllamaClient.QuickStart/) for a runnabl
 
 | OllamaClient | .NET | Minimum Ollama |
 |---|---|---|
+| 2.1.x | net9.0, net10.0 | API of Ollama 0.40; tested live against 0.34 |
+| 2.0.x | net9.0, net10.0 | 0.1.x |
 | 1.1.x | net9.0, net10.0 | 0.1.x |
 | 1.0.x | net8.0 | 0.1.x |
 

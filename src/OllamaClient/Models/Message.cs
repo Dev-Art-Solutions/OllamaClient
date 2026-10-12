@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 public class Message
 {
     /// <summary>
-    /// role: the role of the message, either system, user or assistant
+    /// role: the role of the message, either system, user, assistant or tool
     /// </summary>
     [JsonPropertyName("role")]
     public string Role { get; set; } = default!;
@@ -32,4 +32,26 @@ public class Message
     [JsonPropertyName("tool_calls")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<ToolCall>? ToolCalls { get; set; }
+
+    /// <summary>
+    /// thinking (optional): the model's reasoning trace for this message, when the request enabled <c>think</c>.
+    /// Send it back on assistant messages in later turns to preserve the reasoning context.
+    /// </summary>
+    [JsonPropertyName("thinking")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Thinking { get; set; }
+
+    /// <summary>
+    /// tool_name (optional): on a message with role "tool", the name of the function whose result this is
+    /// </summary>
+    [JsonPropertyName("tool_name")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ToolName { get; set; }
+
+    /// <summary>
+    /// tool_call_id (optional): on a message with role "tool", the <see cref="ToolCall.Id"/> this message answers
+    /// </summary>
+    [JsonPropertyName("tool_call_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? ToolCallId { get; set; }
 }

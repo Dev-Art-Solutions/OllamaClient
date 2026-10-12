@@ -32,6 +32,13 @@ public class EmbedRequest
     public bool? Truncate { get; set; }
 
     /// <summary>
+    /// dimensions: number of dimensions to return, for models that support truncating their embeddings (Matryoshka)
+    /// </summary>
+    [JsonPropertyName("dimensions")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? Dimensions { get; set; }
+
+    /// <summary>
     /// options: additional model parameters such as temperature
     /// </summary>
     [JsonPropertyName("options")]

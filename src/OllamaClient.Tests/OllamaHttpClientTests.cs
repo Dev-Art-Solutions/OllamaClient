@@ -123,8 +123,8 @@ public class OllamaHttpClientTests
         var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var createRequest = new CreateModelRequest
         {
-            Modelfile = "file",
-            Path = "path"
+            Model = "model",
+            From = "base"
         };
         var cancellationToken = default(CancellationToken);
 
@@ -160,8 +160,8 @@ public class OllamaHttpClientTests
         var ollamaClient = new OllamaHttpClient(httpClientFactoryMock.Object);
         var createRequest = new CreateModelStreamRequest
         {
-            Modelfile = "file",
-            Path = "path"
+            Model = "model",
+            From = "base"
         };
         var cancellationToken = default(CancellationToken);
 
@@ -587,35 +587,23 @@ public class OllamaHttpClientTests
             {
                 Seed = 1,
                 Stop = ["test"],
-                RopeFrequencyScale = 1,
-                F16Kv = true,
                 FrequencyPenalty = 1,
                 PresencePenalty = 1,
                 Temperature = 1,
                 TopP = 1,
                 TopK = 1,
-                LowVram = true,
                 MainGpu = 1,
-                Mirostat = 1,
-                MirostatEta = 1,
-                MirostatTau = 1,
-                Numa = false,
                 NumBatch = 1,
                 NumCtx = 1,
                 NumGpu = 1,
-                NumGqa = 1,
                 NumKeep = 1,
                 NumPredict = 1,
                 NumThread = 1,
-                PenalizeNewline = true,
                 RepeatLastN = 1,
                 RepeatPenalty = 1,
-                RopeFrequencyBase = 1,
-                TfsZ = 1,
                 TypicalP = 1,
-                UseMlock = true,
-                UseMmap = true,
-                VocabOnly = true
+                MinP = 0.05f,
+                UseMmap = true
             },
         };
         var cancellationToken = default(CancellationToken);

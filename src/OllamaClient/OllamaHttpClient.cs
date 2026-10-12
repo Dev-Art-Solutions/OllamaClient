@@ -71,6 +71,53 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
     }
 
     /// <inheritdoc/>
+    public async Task<StatusResponse> GetStatus(CancellationToken cancellationToken)
+    {
+        using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
+        var response = await httpClient.GetAsync("api/status", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new OllamaException(await response.Content.ReadAsStringAsync());
+        }
+
+        return (await response.Content.ReadFromJsonAsync<StatusResponse>(cancellationToken))!;
+    }
+
+    /// <inheritdoc/>
+    public async Task<bool> BlobExists(string digest, CancellationToken cancellationToken)
+    {
+        using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
+        using var request = new HttpRequestMessage(HttpMethod.Head, $"api/blobs/{digest}");
+        using var response = await httpClient.SendAsync(request, cancellationToken);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return false;
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new OllamaException($"HEAD api/blobs/{digest} failed with {(int)response.StatusCode} {response.ReasonPhrase}");
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public async Task PushBlob(string digest, Stream content, CancellationToken cancellationToken)
+    {
+        using var httpClient = httpClientFactory.CreateClient(nameof(OllamaHttpClient));
+        using var body = new StreamContent(content);
+        var response = await httpClient.PostAsync($"api/blobs/{digest}", body, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new OllamaException(await response.Content.ReadAsStringAsync());
+        }
+    }
+
+    /// <inheritdoc/>
     public async Task<GenerateResponse> Generate(GenerateRequest request, CancellationToken cancellationToken)
     {
         return await PostAsJsonAsync<GenerateResponse, GenerateRequest>("generate", request, null, cancellationToken);
@@ -106,7 +153,7 @@ public class OllamaHttpClient(IHttpClientFactory httpClientFactory) : IOllamaHtt
             throw new OllamaException(await response.Content.ReadAsStringAsync());
         }
 
-        return (await response.Content.ReadFromJsonAsync<GetModelsResponse>())!;
+        return (await response.Content.ReadFromJsonAsync<GetModelsResponse>(cancellationToken))!;
     }
 
     /// <inheritdoc/>

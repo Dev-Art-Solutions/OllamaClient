@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-10-12
+
+Brings the client in line with the Ollama API as of v0.40.3. Every addition was checked against a live
+Ollama server, not only against fixtures.
+
+### Added
+- `GetStatus()` → `GET /api/status` (whether cloud models are available).
+- `BlobExists(digest)` / `PushBlob(digest, stream)` → `HEAD`/`POST /api/blobs/:digest`, needed to create a model from GGUF or safetensors files.
+- `CreateModelRequest`: `Model`, `From`, `Files`, `Template`, `License`, `System`, `Parameters`, `Messages`, `Quantize`, the fields `/api/create` takes now.
+- `Think` now also takes an effort level: `Think = ThinkValue.High` (or `"low"`, `"medium"`, `"max"`). `Think = true` still compiles.
+- Token log probabilities: `Logprobs` / `TopLogprobs` on `ChatRequest` and `GenerateRequest`; `Logprobs` on the responses.
+- `Truncate` and `Shift` on `ChatRequest` and `GenerateRequest`; `Dimensions` on `EmbedRequest`.
+- Responses: `DoneReason`, `PromptEvalCachedCount`, `RemoteModel`, `RemoteHost`; `GenerateResponse.ToolCalls`.
+- `Message.Thinking`, `Message.ToolName`, `Message.ToolCallId`; `ToolCall.Id`; `FunctionCall.Index`.
+- `ShowRequest.Verbose`; `ShowResponse`: `License`, `System`, `ModelInfo`, `ProjectorInfo`, `Capabilities`, `Messages`, `Renderer`, `Parser`, `ModifiedAt`, `RemoteModel`, `RemoteHost`.
+- `ModelResponse`: `Model`, `Capabilities`, `RemoteModel`, `RemoteHost`; `DetailsResponse`: `ParentModel`, `ContextLength`, `EmbeddingLength`; `RunningModelResponse.ContextLength`; `PushResponse.Completed`.
+- `OptionsRequest.MinP`, `OptionsRequest.DraftNumPredict`.
+- `Model` on `DeleteRequest`, `ShowRequest`, `PullRequest` and `PushRequest`. Ollama has deprecated `name`, but the server still falls back to it, so `Name` keeps working.
+
+### Fixed
+- `GetEmbeddings()` always returned an empty vector: `/api/embeddings` answers with `embedding`, and the client read `embeddings`.
+- `ChatResponse.Thinking` was always null: Ollama returns the chat reasoning trace on the message. The property is now obsolete and forwards to `Message.Thinking`.
+- `Create()` with a `Modelfile` fails on any current Ollama with "neither 'from' or 'files' was specified". `Modelfile` and `Path` are now obsolete and point to the new fields.
+- `GetModels()` ignored its cancellation token while reading the body.
+- `OptionsRequest` sent unset options as explicit `null`s; they are now omitted.
+
+### Changed
+- `GenerateRequest.Think` / `ChatRequest.Think` are now `ThinkValue?` instead of `bool?`. Source compatible for assignment, but code compiled against 2.0.x needs to be recompiled.
+- `IOllamaHttpClient` gained `GetStatus`, `BlobExists` and `PushBlob`, so custom implementations of the interface must add them.
+
+### Deprecated
+- `OptionsRequest` members that Ollama no longer recognizes and ignores: `TfsZ`, `Mirostat`, `MirostatTau`, `MirostatEta`, `PenalizeNewline`, `Numa`, `NumGqa`, `LowVram`, `F16Kv`, `VocabOnly`, `UseMlock`, `RopeFrequencyBase`, `RopeFrequencyScale`.
+
 ## [2.0.1] - 2026-07-13
 
 ### Fixed
@@ -67,7 +100,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DI integration via `AddOllamaClient()` extension method.
 - Configurable base URL via `OllamaConfiguration`.
 
-[Unreleased]: https://github.com/Dev-Art-Solutions/OllamaClient/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/Dev-Art-Solutions/OllamaClient/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/Dev-Art-Solutions/OllamaClient/compare/v2.0.1...v2.1.0
+[2.0.1]: https://github.com/Dev-Art-Solutions/OllamaClient/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/Dev-Art-Solutions/OllamaClient/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/Dev-Art-Solutions/OllamaClient/releases/tag/v1.0.0
 [2f344d0]: https://github.com/Dev-Art-Solutions/OllamaClient/commit/2f344d0

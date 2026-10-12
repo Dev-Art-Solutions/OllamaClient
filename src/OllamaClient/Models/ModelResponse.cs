@@ -38,4 +38,32 @@ public class ModelResponse
     [JsonPropertyName("details")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DetailsResponse? Details { get; set; }
+
+    /// <summary>
+    /// model: the model name
+    /// </summary>
+    [JsonPropertyName("model")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Model { get; set; }
+
+    /// <summary>
+    /// capabilities: what the model can do, e.g. "completion", "tools", "thinking", "vision", "embedding"
+    /// </summary>
+    [JsonPropertyName("capabilities")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<string>? Capabilities { get; set; }
+
+    /// <summary>
+    /// remote_model: for a cloud model, the name of the model on the remote host
+    /// </summary>
+    [JsonPropertyName("remote_model")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? RemoteModel { get; set; }
+
+    /// <summary>
+    /// remote_host: for a cloud model, the host that serves it
+    /// </summary>
+    [JsonPropertyName("remote_host")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? RemoteHost { get; set; }
 }

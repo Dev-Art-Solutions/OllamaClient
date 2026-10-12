@@ -43,9 +43,17 @@ public class OptionsRequest
     public float? TopP { get; set; }
 
     /// <summary>
+    /// min_p: minimum probability for a token to be considered, relative to the probability of the most likely token (0.0-1.0). Alternative to top_p.
+    /// </summary>
+    [JsonPropertyName("min_p")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public float? MinP { get; set; }
+
+    /// <summary>
     /// tfs_z: Tail free sampling is used to reduce the impact of less probable tokens from the output. A higher value (e.g., 2.0) will reduce the impact more, while a value of 1.0 disables this setting. (default: 1)
     /// </summary>
     [JsonPropertyName("tfs_z")]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public float? TfsZ { get; set; }
 
@@ -88,119 +96,158 @@ public class OptionsRequest
     /// frequency_penalty
     /// </summary>
     [JsonPropertyName("frequency_penalty")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public float? FrequencyPenalty { get; set; }
 
     /// <summary>
     /// mirostat: Enable Mirostat sampling for controlling perplexity. (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0)
     /// </summary>
     [JsonPropertyName("mirostat")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     public int? Mirostat { get; set; }
 
     /// <summary>
     /// mirostat_tau: Controls the balance between coherence and diversity of the output. A lower value will result in more focused and coherent text. (Default: 5.0)
     /// </summary>
     [JsonPropertyName("mirostat_tau")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     public float? MirostatTau { get; set; }
 
     /// <summary>
     /// mirostat_eta: Influences how quickly the algorithm responds to feedback from the generated text. A lower learning rate will result in slower adjustments, while a higher learning rate will make the algorithm more responsive. (Default: 0.1)
     /// </summary>
     [JsonPropertyName("mirostat_eta")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     public float? MirostatEta { get; set; }
 
     /// <summary>
     /// penalize_newline
     /// </summary>
     [JsonPropertyName("penalize_newline")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     public bool? PenalizeNewline { get; set; }
 
     /// <summary>
     /// stop: Sets the stop sequences to use. When this pattern is encountered the LLM will stop generating text and return. Multiple stop patterns may be set by specifying multiple separate stop parameters in a modelfile.
     /// </summary>
     [JsonPropertyName("stop")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<string>? Stop { get; set; }
 
     /// <summary>
     /// numa: numa enabled
     /// </summary>
     [JsonPropertyName("numa")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     public bool? Numa { get; set; }
 
     /// <summary>
     /// num_ctx: Sets the size of the context window used to generate the next token. (Default: 2048)
     /// </summary>
     [JsonPropertyName("num_ctx")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? NumCtx { get; set; }
 
     /// <summary>
     /// num_batch
     /// </summary>
     [JsonPropertyName("num_batch")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? NumBatch { get; set; }
 
     /// <summary>
     /// num_gqa: The number of GQA groups in the transformer layer. Required for some models, for example it is 8 for llama2:70b
     /// </summary>
     [JsonPropertyName("num_gqa")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     public int? NumGqa { get; set; }
 
     /// <summary>
     /// num_gpu: The number of layers to send to the GPU(s). On macOS it defaults to 1 to enable metal support, 0 to disable.
     /// </summary>
     [JsonPropertyName("num_gpu")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? NumGpu { get; set; }
 
     /// <summary>
     /// main_gpu
     /// </summary>
     [JsonPropertyName("main_gpu")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MainGpu { get; set; }
 
     /// <summary>
     /// low_vram
     /// </summary>
     [JsonPropertyName("low_vram")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     public bool? LowVram { get; set; }
 
     /// <summary>
     /// f16_kv
     /// </summary>
     [JsonPropertyName("f16_kv")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     public bool? F16Kv { get; set; }
 
     /// <summary>
     /// vocab_only
     /// </summary>
     [JsonPropertyName("vocab_only")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     public bool? VocabOnly { get; set; }
 
     /// <summary>
     /// use_mmap
     /// </summary>
     [JsonPropertyName("use_mmap")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? UseMmap { get; set; }
 
     /// <summary>
     /// use_mlock
     /// </summary>
     [JsonPropertyName("use_mlock")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     public bool? UseMlock { get; set; }
 
     /// <summary>
     /// rope_frequency_base
     /// </summary>
     [JsonPropertyName("rope_frequency_base")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     public float? RopeFrequencyBase { get; set; }
 
     /// <summary>
     /// rope_frequency_scale
     /// </summary>
     [JsonPropertyName("rope_frequency_scale")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Obsolete("No longer recognized by Ollama; the server ignores this option.")]
     public float? RopeFrequencyScale { get; set; }
 
     /// <summary>
     /// num_thread: Sets the number of threads to use during computation. By default, Ollama will detect this for optimal performance. It is recommended to set this value to the number of physical CPU cores your system has (as opposed to the logical number of cores).
     /// </summary>
     [JsonPropertyName("num_thread")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? NumThread { get; set; }
+
+    /// <summary>
+    /// draft_num_predict: number of tokens the draft model proposes per step, for models created with a speculative-decoding draft model
+    /// </summary>
+    [JsonPropertyName("draft_num_predict")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? DraftNumPredict { get; set; }
 }

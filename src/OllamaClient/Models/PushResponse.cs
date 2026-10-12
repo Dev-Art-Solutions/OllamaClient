@@ -26,4 +26,11 @@ public class PushResponse
     [JsonPropertyName("total")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public long? Total { get; set; }
+
+    /// <summary>
+    /// completed: number of bytes uploaded so far
+    /// </summary>
+    [JsonPropertyName("completed")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public long? Completed { get; set; }
 }

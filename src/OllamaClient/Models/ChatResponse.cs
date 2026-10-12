@@ -27,17 +27,56 @@ public class ChatResponse
     public Message? Message { get; set; }
 
     /// <summary>
-    /// thinking: the reasoning trace produced before the response (only present in streaming chunks when think=true)
+    /// The reasoning trace of the response. Ollama returns it on the message (<c>message.thinking</c>), never at the
+    /// top level of a chat response, so this reads and writes <see cref="Message.Thinking"/>.
     /// </summary>
-    [JsonPropertyName("thinking")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Thinking { get; set; }
+    [JsonIgnore]
+    [Obsolete("Ollama returns the chat reasoning trace on the message. Use Message.Thinking instead.")]
+    public string? Thinking
+    {
+        get => Message?.Thinking;
+        set
+        {
+            if (Message is not null)
+            {
+                Message.Thinking = value;
+            }
+        }
+    }
 
     /// <summary>
     /// done: true if the request is done(used by streaming to indicate the last message)
     /// </summary>
     [JsonPropertyName("done")]
     public bool Done { get; set; }
+
+    /// <summary>
+    /// done_reason: why generation stopped, e.g. "stop" (natural end or stop sequence), "length" (num_predict or context reached) or "load"/"unload"
+    /// </summary>
+    [JsonPropertyName("done_reason")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? DoneReason { get; set; }
+
+    /// <summary>
+    /// logprobs: log probabilities of the generated tokens; present when the request enabled <c>logprobs</c>
+    /// </summary>
+    [JsonPropertyName("logprobs")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<Logprob>? Logprobs { get; set; }
+
+    /// <summary>
+    /// remote_model: for a cloud model, the name of the model on the remote host
+    /// </summary>
+    [JsonPropertyName("remote_model")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? RemoteModel { get; set; }
+
+    /// <summary>
+    /// remote_host: for a cloud model, the host that served the request
+    /// </summary>
+    [JsonPropertyName("remote_host")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? RemoteHost { get; set; }
 
     /// <summary>
     /// total_duration: time spent generating the response
@@ -59,6 +98,13 @@ public class ChatResponse
     [JsonPropertyName("prompt_eval_count")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? PromptEvalCount { get; set; }
+
+    /// <summary>
+    /// prompt_eval_cached_count: number of prompt tokens served from the KV cache instead of being evaluated
+    /// </summary>
+    [JsonPropertyName("prompt_eval_cached_count")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? PromptEvalCachedCount { get; set; }
 
     /// <summary>
     /// prompt_eval_duration: time spent in nanoseconds evaluating the prompt.
